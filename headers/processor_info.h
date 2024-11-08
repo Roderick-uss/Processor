@@ -9,20 +9,22 @@ typedef int (*proc_func_t)(spu_t* spu);
 
 // NO NEGATIVE NUMBERS
 enum COMMANDS_T {
-    HLT   = 1 ,
-    OUT   = 2 ,
-    ADD   = 3 ,
-    SUB   = 4 ,
-    MUL   = 5 ,
-    DIV   = 6 ,
-    PUSH  = 7 ,
-    POP   = 8 ,
-    JMP   = 9 ,
-    JB    = 10 ,
+    HLT   =  1,
+    OUT   =  2,
+    ADD   =  3,
+    SUB   =  4,
+    MUL   =  5,
+    DIV   =  6,
+    PUSH  =  7,
+    POP   =  8,
+    JMP   =  9,
+    JB    = 10,
     JA    = 11,
-    CALL  = 12,
-    DRAW  = 13,
-    BREAK = 14,
+    JE    = 12,
+    CALL  = 13,
+    DRAW  = 14,
+    BREAK = 15,
+    SQRT  = 16,
     UNDEF = -1,
 };
 
@@ -34,11 +36,10 @@ const int MAX_CODE_SIZE = 500;
 const int MAX_DEEP      =  50;
 const int RAM_SIDE      =   7;
 
+const int PRECISION = 10000;
+
 const size_t END_PROC = MAX_CODE_SIZE + 1;
 
-const int cmd_mask = (1<<8) - 1;
-
-// const int arg_mask = cmd_mask << 8;
 
 enum ARGUMENT_TYPE {
     NO_ARG    = 0,
@@ -48,7 +49,10 @@ enum ARGUMENT_TYPE {
     PUSH_ARG  = 4,
 };
 
+const int cmd_mask = (1<<8) - 1;
+// const int arg_mask = cmd_mask << 8;
 static const int arg_shift = 8;
+
 enum ARG_MASK_T {
     ERR_T = 64<<arg_shift,
     NUM_T =  1<<arg_shift,
@@ -80,9 +84,11 @@ const COMMAND CMD_LIST[] ={
 {"JMP"  , 1, JMP  , LABEL_ARG, PROC_JMP  },
 {"JA"   , 1, JA   , LABEL_ARG, PROC_JA   },
 {"JB"   , 1, JB   , LABEL_ARG, PROC_JB   },
+{"JE"   , 1, JE   , LABEL_ARG, PROC_JE   },
 {"CALL" , 1, CALL , LABEL_ARG, PROC_CALL },
 {"DRAW" , 0, DRAW , NO_ARG   , PROC_DRAW },
 {"BREAK", 0, BREAK, NO_ARG   , PROC_BREAK},
+{"SQRT" , 0, SQRT , NO_ARG   , PROC_SQRT },
 {""     , 0, UNDEF, NO_ARG   , PROC_ERROR}}; // uind must be last element
 
 #else //  START_PROCESSOR
@@ -99,9 +105,11 @@ const COMMAND CMD_LIST[] ={
 {"JMP"  , 1, JMP  , LABEL_ARG},
 {"JA"   , 1, JA   , LABEL_ARG},
 {"JB"   , 1, JB   , LABEL_ARG},
+{"JE"   , 1, JE   , LABEL_ARG},
 {"CALL" , 1, CALL , LABEL_ARG},
 {"DRAW" , 0, DRAW , NO_ARG   },
 {"BREAK", 0, BREAK, NO_ARG   },
+{"SQRT" , 0, SQRT , NO_ARG   },
 {""     , 0, UNDEF, NO_ARG   }}; // uind must be last element
 
 #endif // START_PROCESSOR

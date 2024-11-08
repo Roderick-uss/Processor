@@ -33,6 +33,8 @@ all: assembler processor disassembler
 print:
 	@echo $(ASSEMBLER_O)
 
+run_all: run_assembler run_processor
+
 run_assembler: assembler
 	@./$(B_PREFIX)assembler.exe
 

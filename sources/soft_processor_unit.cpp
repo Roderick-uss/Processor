@@ -54,7 +54,7 @@ static int spu_dump(const spu_t* spu, int error_mask) {
 
         memset(spases, '_', spu->ip * 5 + 9);
         LOG_RED("%s|", spases);
-        LOG_RED("(ip = %llx)\n", spu->ip);
+        LOG_RED("(ip = %llx)\n\n", spu->ip);
 
         free(spases);
 

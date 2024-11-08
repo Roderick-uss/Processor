@@ -1,0 +1,35 @@
+PUSH 7
+POP cx
+PUSH 1
+POP bx
+PUSH 1
+POP ax
+
+CALL FACT
+
+PUSH ax
+OUT
+HLT
+
+
+FACT:
+
+PUSH bx
+PUSH 1
+ADD
+POP bx
+
+PUSH bx
+PUSH ax
+MUL
+POP ax
+
+PUSH cx
+PUSH bx
+JB SKIP
+
+CALL FACT
+
+SKIP:
+
+BREAK

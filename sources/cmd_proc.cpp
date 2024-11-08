@@ -25,7 +25,7 @@ int PROC_OUT  (spu_t* spu) {
         return -1;
     }
     if (stack_pop(&spu->stk, &result)) return 1;
-    printf("OUT: %d\n", result);
+    printf("OUT: %4.4lg\n", (double)result / PRECISION);
     spu->ip++;
 
     return 0;
@@ -58,7 +58,7 @@ int PROC_MUL  (spu_t* spu) {
     int a = 0, b = 0;
     if (stack_pop( &spu->stk, &b)) return 1;
     if (stack_pop( &spu->stk, &a)) return 1;
-    stack_push(&spu->stk, a * b);
+    stack_push(&spu->stk, a * b / PRECISION);
     spu->ip++;
 
     return 0;
@@ -69,7 +69,17 @@ int PROC_DIV  (spu_t* spu) {
     int a = 0, b = 0;
     if (stack_pop( &spu->stk, &b)) return 1;
     if (stack_pop( &spu->stk, &a)) return 1;
-    stack_push(&spu->stk, a / b);
+    stack_push(&spu->stk, a * PRECISION / b);
+    spu->ip++;
+
+    return 0;
+}
+int PROC_SQRT(spu_t* spu) {
+    spu_assert(spu);
+
+    int a = 0;
+    if (stack_pop( &spu->stk, &a)) return 1;
+    stack_push(&spu->stk, (int)sqrt((double)a * PRECISION));
     spu->ip++;
 
     return 0;
@@ -79,9 +89,9 @@ int PROC_PUSH (spu_t* spu) {
 
     int result = 0;
     int arg_type = spu->code[spu->ip++];
-    if (arg_type & NUM_T) result += spu->code[spu->ip++];
+    if (arg_type & NUM_T) result += spu->code[spu->ip++] * PRECISION;
     if (arg_type & REG_T) result += spu->reg[spu->code[spu->ip++]];
-    if (arg_type & RAM_T) result  = spu->ram[result];
+    if (arg_type & RAM_T) result  = spu->ram[result / PRECISION];
 
     stack_push(&spu->stk, result);
 
@@ -91,10 +101,7 @@ int PROC_POP  (spu_t* spu) {
     if (spu_assert(spu)) return 1;
 
     int  arg_type = spu->code[spu->ip++];
-    int* place = 0;
-    int  result = 0;
-
-    if (stack_pop(&spu->stk, &result)) return 1;
+    int* place    = 0;
 
     // if (arg_type & RAM_T)
     if (arg_type & NUM_T) {
@@ -104,7 +111,7 @@ int PROC_POP  (spu_t* spu) {
     if (arg_type & REG_T) place = spu->reg + spu->code[spu->ip++];
     if (arg_type & RAM_T) place = spu->ram + *place;
 
-    *place = result;
+    stack_pop(&spu->stk, place);
 
     return 0;
 }
@@ -123,7 +130,7 @@ int PROC_JB   (spu_t* spu) {
     int a = 0, b = 0;
     if (stack_pop( &spu->stk, &b)) return 1;
     if (stack_pop( &spu->stk, &a)) return 1;
-    if (a < b) spu->ip = spu->code[spu->ip];
+    if (a <  b) spu->ip = spu->code[spu->ip];
     else       spu->ip++;
 
     return 0;
@@ -135,7 +142,19 @@ int PROC_JA   (spu_t* spu) {
     int a = 0, b = 0;
     if (stack_pop( &spu->stk, &b)) return 1;
     if (stack_pop( &spu->stk, &a)) return 1;
-    if (a > b) spu->ip = spu->code[spu->ip];
+    if (a >  b) spu->ip = spu->code[spu->ip];
+    else       spu->ip++;
+
+    return 0;
+}
+int PROC_JE   (spu_t* spu) {
+    if (spu_assert(spu)) return 1;
+
+    spu->ip++;
+    int a = 0, b = 0;
+    if (stack_pop( &spu->stk, &b)) return 1;
+    if (stack_pop( &spu->stk, &a)) return 1;
+    if (a == b) spu->ip = spu->code[spu->ip];
     else       spu->ip++;
 
     return 0;

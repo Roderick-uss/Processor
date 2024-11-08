@@ -1,35 +1,4 @@
-PUSH 7
-POP cx
-PUSH 1
-POP bx
-PUSH 1
-POP ax
-
-CALL FACT
-
-PUSH ax
+PUSH 10
+SQRT
 OUT
 HLT
-
-
-FACT:
-
-PUSH bx
-PUSH 1
-ADD
-POP bx
-
-PUSH bx
-PUSH ax
-MUL
-POP ax
-
-PUSH bx
-PUSH cx
-JA SKIP
-
-CALL FACT
-
-SKIP:
-
-BREAK
