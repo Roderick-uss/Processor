@@ -13,23 +13,19 @@ HLT
 
 
 FACT:
+    PUSH bx
+    PUSH 1
+    ADD
+    POP bx
 
-PUSH bx
-PUSH 1
-ADD
-POP bx
+    PUSH bx
+    PUSH ax
+    MUL
+    POP ax
 
-PUSH bx
-PUSH ax
-MUL
-POP ax
-
-PUSH cx
-PUSH bx
-JB SKIP
-
-CALL FACT
-
-SKIP:
-
+    PUSH cx
+    PUSH bx
+    JE SKIP
+        CALL FACT
+    SKIP:
 BREAK

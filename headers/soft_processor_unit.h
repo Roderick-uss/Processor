@@ -4,14 +4,14 @@
 #include "stack.h"
 
 struct spu_t {
-    size_t  ip;
-    size_t  code_size;
-    int*    code;
-    int*    ram;
-    int*    reg;
-    stack_t stk;
-    size_t* call_heap;
-    size_t  call_deep;
+    size_t   ip;
+    size_t   code_size;
+    int*     code;
+    int*     ram;
+    int*     reg;
+    stack_t* stk;
+    size_t*  call_heap;
+    size_t   call_deep;
 };
 
 enum SPU_ERRORS {
@@ -24,7 +24,7 @@ enum SPU_ERRORS {
     STACK_PROBLEM = 1<<6,
 };
 
-#define ASSERT_SPU(spu) assert(!spu_assert(spu))
+#define ASSERT_SPU(spu) assert(spu_assert(spu))
 
 spu_t* spu_ctor();
 int    spu_dtor(spu_t* spu);

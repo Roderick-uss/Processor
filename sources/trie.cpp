@@ -5,14 +5,14 @@
 #include "commoner.h"
 #include "trie.h"
 
-static int trie_cell_dump (const cell* root, int error_vector);
+static int trie_cell_dump (const cell* root, int error_mask);
 
-int trie_ctor(cell* root) {
-    assert(root);
-    *root = {};
+cell* trie_ctor() {
+    cell* root = (cell*)calloc(1, sizeof(cell));
+    if (!root) return 0;
     root->symbol = '#';
 
-    return 0;
+    return root;
 }
 
 int trie_dtor(cell* root) {
@@ -24,6 +24,7 @@ int trie_dtor(cell* root) {
     }
 
     *root = {};
+    free(root);
 
     return 0;
 }
@@ -34,8 +35,7 @@ int trie_cell_verify(const cell* root) {
     return 0;
 }
 int trie_cell_assert(const cell* root) {
-    trie_cell_dump(root, trie_cell_verify(root));
-    return 1;
+    return !trie_cell_dump(root, trie_cell_verify(root));
 }
 int trie_print (const cell* root, char* prefix, size_t pref_size) {
     ASSERT_TRIE(root);
@@ -131,20 +131,20 @@ int trie_equal (const void* first, const void* second) {
     return 1;
 }
 
-static int trie_cell_dump (const cell* root, int error_vector) {
-    if (error_vector == 0) {
-        return 1;
-    }
-    if (error_vector & ZERO_ROOT) {
-        LOG_FATAL("Zero pointer to cell\n");
+static int trie_cell_dump (const cell* root, int error_mask) {
+    if (error_mask == 0) {
         return 0;
     }
+    if (error_mask & ZERO_ROOT) {
+        LOG_FATAL("Zero pointer to cell\n");
+        return error_mask;
+    }
     assert(root);
-    if (!(error_vector & PRINT_CELL)) {
+    if (!(error_mask & PRINT_CELL)) {
         if (root->symbol != '\0') LOG_GREEN("%c : ", root->symbol);
         else                      LOG_GREEN("\\0: ");
     }
-    if (!root->dest) return 1;
+    if (!root->dest) return error_mask & ~PRINT_CELL;
 
     for(size_t i = 0; i < DEST_SIZE; ++i) {
         if (root->dest[i].symbol != '\0') {
@@ -153,5 +153,5 @@ static int trie_cell_dump (const cell* root, int error_vector) {
         }
     }
     LOG_WHITE("\n");
-    return 1;
+    return error_mask & ~PRINT_CELL;
 }

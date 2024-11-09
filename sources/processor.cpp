@@ -34,6 +34,10 @@ int main(int argc, const char* argv[]) {
     if (!output_file) {run_file_error(output_file); return 1;}
 
     spu_t* spu = spu_ctor();
+    if (!spu) {
+        LOG_FATAL("SPU DID NOT CREATED");
+        return 1;
+    }
     // return 1;
 
     short* code_buffer = (short*)get_file_buffer(input_file);
@@ -64,9 +68,7 @@ static size_t get_size(void* code) {
 }
 
 static int copy_code(spu_t* spu, size_t size, const short* code) {
-    assert(spu);
-    assert(size <= MAX_CODE_SIZE);
-    assert(code);
+    ASSERT_SPU(spu);
 
     spu->code_size = size;
     for(size_t i = 0; i < size; ++i) {
@@ -77,7 +79,7 @@ static int copy_code(spu_t* spu, size_t size, const short* code) {
 }
 
 static int run_proc(spu_t* spu) {
-    spu_assert(spu);
+    ASSERT_SPU(spu);
     assert(spu->ip == 0);
 
     int error = 0;
@@ -86,7 +88,7 @@ static int run_proc(spu_t* spu) {
     const COMMAND* check_cmd = {};
 
     while (!error && spu->ip != END_PROC) {
-        spu_print(spu);
+        // spu_print(spu);
         // scanf("%d", &to_scan);
 
         for(size_t index_cmd = 0; index_cmd < sizeof(CMD_LIST) / sizeof(CMD_LIST[0]); ++index_cmd) {

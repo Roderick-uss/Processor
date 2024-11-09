@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "colors.h"
 #include "commoner.h"
 #include "processor_info.h"
 #include "soft_processor_unit.h"
@@ -27,15 +28,16 @@ static int spu_dump(const spu_t* spu, int error_mask) {
     else {
         LOG_CYAN("[ip]   : ");
         for(size_t i = 0; i < spu->code_size; ++i) {
-            printf("%-4.4llx ", i);
+            if (i != spu->ip) LOG_WHITE(          "%-4.4llx "           , i);
+            else              LOG_RED  (UNDERLINE "%-4.4llx" DEFAULT " ", i);
         }
-        putchar('\n');
+        putc('\n', stderr);
 
         LOG_CYAN("[code] : ");
         for(size_t i = 0; i < spu->code_size; ++i) {
-            LOG_INFO("%-4.4x ", spu->code[i]);
+            LOG_INFO("%-4.4d ", spu->code[i] / PRECISION);
         }
-        putchar('\n');
+        putc('\n', stderr);
 
         char* spases = (char*)calloc(5 * spu->ip + 10, sizeof(char));
         memset(spases, ' ', spu->ip * 5 + 9);
@@ -63,13 +65,13 @@ static int spu_dump(const spu_t* spu, int error_mask) {
     }
     if (error_mask & STACK_PROBLEM) {
         LOG_FATAL("STACK BROKEN\n");
-        stack_assert(&spu->stk);
+        stack_assert(spu->stk);
     }
     else {
-        LOG_CYAN("stk size = %llx\n", spu->stk.size);
+        LOG_CYAN("stk size = %llx\n", spu->stk->size);
         LOG_CYAN("[stk]  : ");
-        for(size_t i = 0; i < spu->stk.size; ++i) {
-            LOG_RED("%x ", spu->stk.data[i]);
+        for(size_t i = 0; i < spu->stk->size; ++i) {
+            LOG_RED("%d ", spu->stk->data[i] / PRECISION);
         }
         LOG_BLUE("<-- last\n");
     }
@@ -78,7 +80,7 @@ static int spu_dump(const spu_t* spu, int error_mask) {
     }
     else {
         for(int i = 0; i < REGS_SIZE; ++i) {
-            LOG_PURPLE("%cx = %x\n", 'a' + i, spu->reg[i]);
+            LOG_PURPLE("%cx = %d\n", 'a' + i, spu->reg[i] / PRECISION);
         }
         putchar('\n');
     }
@@ -95,8 +97,8 @@ static int spu_dump(const spu_t* spu, int error_mask) {
         }
     }
     LOG_YELLOW("____________________________________________________________________________\n\n\n");
-    if (error_mask == PRINT_SPU) return 0;
-    return error_mask;
+
+    return error_mask & ~PRINT_SPU;
 }
 
 int spu_verify(const spu_t* spu) {
@@ -107,18 +109,18 @@ int spu_verify(const spu_t* spu) {
     if (!spu->ram)                error_mask |= ZERO_RAM;
     if (!spu->reg)                error_mask |= ZERO_REGS;
     if (!spu->call_heap)          error_mask |= ZERO_CALL;
-    if (!stack_assert(&spu->stk)) error_mask |= STACK_PROBLEM;
+    if (!stack_assert(spu->stk)) error_mask |= STACK_PROBLEM;
 
     return error_mask;
 }
 
 int spu_print(const spu_t* spu) {
     assert(!spu_dump(spu, spu_verify(spu) | PRINT_SPU));
-    return 1;
+    return 0;
 }
 
 int spu_assert(const spu_t* spu) {
-    return spu_dump(spu, spu_verify(spu));
+    return !spu_dump(spu, spu_verify(spu));
 }
 
 spu_t* spu_ctor() {
@@ -130,7 +132,8 @@ spu_t* spu_ctor() {
     if (!(spu->code      = (int*)    calloc(MAX_CODE_SIZE, sizeof(int   )))) return 0;
     if (!(spu->call_heap = (size_t*) calloc(MAX_DEEP     , sizeof(size_t)))) return 0;
 
-    stack_ctor(&spu->stk);
+    if (!(spu->stk = (stack_t*)calloc(1, sizeof(stack_t)))) return 0;;
+    stack_ctor(spu->stk);
 
     ASSERT_SPU(spu);
     return spu;
@@ -139,7 +142,8 @@ spu_t* spu_ctor() {
 int spu_dtor(spu_t* spu) {
     ASSERT_SPU(spu);
 
-    stack_dtor(&spu->stk);
+    stack_dtor(spu->stk);
+    free(spu->stk);
 
     free(spu->call_heap);
     free(spu->ram      );

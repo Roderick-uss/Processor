@@ -113,7 +113,6 @@ void* get_file_buffer(const char* file_name) {
     size_t size = fread(buffer, 1, file_info.st_size, input_ptr);
     buffer[size] = '\0';
     LOG_INFO   ("size = %llu\n", size);
-    LOG_YELLOW ("%s", buffer);
 
     fclose(input_ptr);
 

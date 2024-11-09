@@ -18,8 +18,8 @@ const size_t DEST_SIZE     = 32;
 const size_t ALPHABET_SIZE = 26;
 #define ASSERT_TRIE(root) assert(trie_cell_assert(root))
 
-int trie_ctor(cell* root);
-int trie_dtor(cell* root);
+cell* trie_ctor();
+int   trie_dtor(cell* root);
 
 int trie_cell_assert (const cell* root);
 int trie_cell_verify (const cell* root);

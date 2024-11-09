@@ -15,28 +15,30 @@ enum COMMANDS_T {
     SUB   =  4,
     MUL   =  5,
     DIV   =  6,
-    PUSH  =  7,
-    POP   =  8,
-    JMP   =  9,
-    JB    = 10,
-    JA    = 11,
-    JE    = 12,
-    CALL  = 13,
-    DRAW  = 14,
-    BREAK = 15,
-    SQRT  = 16,
+    TDIV  =  7,
+    MOD   =  8,
+    PUSH  =  9,
+    POP   = 10,
+    JMP   = 11,
+    JB    = 12,
+    JA    = 13,
+    JE    = 14,
+    JNE   = 15,
+    CALL  = 16,
+    DRAW  = 17,
+    BREAK = 18,
+    SQRT  = 19,
     UNDEF = -1,
 };
 
+const int RAM_SIDE      =   41;
+const int RAM_SIZE      =  RAM_SIDE * RAM_SIDE;
+const int MAX_LABELS    =   50;
+const int REGS_SIZE     =    5;
+const int MAX_CODE_SIZE = 1000;
+const int MAX_DEEP      =   50;
 
-const int MAX_LABELS    =  50;
-const int RAM_SIZE      =  49;
-const int REGS_SIZE     =   5;
-const int MAX_CODE_SIZE = 500;
-const int MAX_DEEP      =  50;
-const int RAM_SIDE      =   7;
-
-const int PRECISION = 10000;
+const int PRECISION = 100;
 
 const size_t END_PROC = MAX_CODE_SIZE + 1;
 
@@ -79,12 +81,15 @@ const COMMAND CMD_LIST[] ={
 {"SUB"  , 0, SUB  , NO_ARG   , PROC_SUB  },
 {"MUL"  , 0, MUL  , NO_ARG   , PROC_MUL  },
 {"DIV"  , 0, DIV  , NO_ARG   , PROC_DIV  },
+{"TDIV" , 0, TDIV , NO_ARG   , PROC_TDIV },
+{"MOD"  , 0, MOD  , NO_ARG   , PROC_MOD  },
 {"PUSH" , 1, PUSH , PUSH_ARG , PROC_PUSH },
 {"POP"  , 1, POP  , POP_ARG  , PROC_POP  },
 {"JMP"  , 1, JMP  , LABEL_ARG, PROC_JMP  },
 {"JA"   , 1, JA   , LABEL_ARG, PROC_JA   },
 {"JB"   , 1, JB   , LABEL_ARG, PROC_JB   },
 {"JE"   , 1, JE   , LABEL_ARG, PROC_JE   },
+{"JNE"  , 1, JNE  , LABEL_ARG, PROC_JNE  },
 {"CALL" , 1, CALL , LABEL_ARG, PROC_CALL },
 {"DRAW" , 0, DRAW , NO_ARG   , PROC_DRAW },
 {"BREAK", 0, BREAK, NO_ARG   , PROC_BREAK},
@@ -100,12 +105,15 @@ const COMMAND CMD_LIST[] ={
 {"SUB"  , 0, SUB  , NO_ARG   },
 {"MUL"  , 0, MUL  , NO_ARG   },
 {"DIV"  , 0, DIV  , NO_ARG   },
+{"TDIV" , 0, TDIV , NO_ARG   },
+{"MOD"  , 0, MOD  , NO_ARG   },
 {"PUSH" , 1, PUSH , PUSH_ARG },
 {"POP"  , 1, POP  , POP_ARG  },
 {"JMP"  , 1, JMP  , LABEL_ARG},
 {"JA"   , 1, JA   , LABEL_ARG},
 {"JB"   , 1, JB   , LABEL_ARG},
 {"JE"   , 1, JE   , LABEL_ARG},
+{"JNE"  , 1, JNE  , LABEL_ARG},
 {"CALL" , 1, CALL , LABEL_ARG},
 {"DRAW" , 0, DRAW , NO_ARG   },
 {"BREAK", 0, BREAK, NO_ARG   },

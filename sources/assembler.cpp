@@ -26,7 +26,7 @@ struct asm_label_unit {
 struct asm_label_info {
     asm_label_unit* data;
     size_t          size;
-    trie_t          trie;
+    trie_t*         trie;
 };
 
 struct possible_argument_t {
@@ -79,7 +79,9 @@ int main(int argc, const char* argv[]) {
     if (!output_ptr) {run_file_error(output_file); return 1;}
 
     char* buffer = (char*)get_file_buffer(input_file);
-    error = !buffer;
+    if(!buffer) return 1;
+
+    LOG_YELLOW ("%s", buffer);
 
     short* code = (short*)calloc(MAX_CODE_SIZE, sizeof(short));
     assert(code);
@@ -94,7 +96,7 @@ int main(int argc, const char* argv[]) {
     // write_labels(output_ptr, &labels);
     if (!error) write_code(output_ptr, code, code_size);
 
-    printf("WRITED\n");
+    LOG_WHITE("WRITED\n");
 
     fclose(output_ptr);
     label_buffer_dtor(&labels);
@@ -111,9 +113,10 @@ int main(int argc, const char* argv[]) {
 int compile_labels (const char* buffer, asm_label_info* labels) {
     assert(labels);
     assert(buffer);
-    trie_cell_assert(&labels->trie);
+    trie_cell_assert(labels->trie);
 
     char cur_line [MAX_LINE_SIZE   ] = {};
+    char junk     [MAX_LINE_SIZE   ] = {};
     char cur_label[MAX_COMMAND_SIZE] = {};
 
     size_t line_pos  = 0;
@@ -125,9 +128,11 @@ int compile_labels (const char* buffer, asm_label_info* labels) {
 
     const COMMAND* check_cmd = {};
 
-    for(int line_cnt = 1; sscanf(buffer, "%[^\r\n]\r\n%lln", cur_line, &line_size) && !error; ++line_cnt) {
+    for(int line_cnt = 1; !error && *buffer; ++line_cnt) {
+        if(isblank(*buffer)) sscanf(buffer, "%[ \t\v]%[^\r\n]\r\n%lln", junk, cur_line, &line_size);
+        else                 sscanf(buffer, "%[^\r\n]\r\n%lln"        ,       cur_line, &line_size);
+
         buffer += line_size;
-        if (!*buffer)   break;
         if (!*cur_line) continue;
 
         if (cur_line[MAX_LINE_SIZE - 1]) {
@@ -174,12 +179,12 @@ int compile_labels (const char* buffer, asm_label_info* labels) {
 
         cur_label[line_pos - 1] = '\0';
 
-        if (trie_exist(&labels->trie, cur_label)) {
+        if (trie_exist(labels->trie, cur_label)) {
             error = run_syntax_error(cur_line, "LABEL ALREADY EXIST", line_cnt);
             break;
         }
 
-        trie_insert(&labels->trie, cur_label);
+        trie_insert(labels->trie, cur_label);
 
         asm_label_unit new_label = {};
         new_label.name = (char*)calloc(line_pos - 1,sizeof(char));
@@ -201,9 +206,10 @@ int compile_code   (const char* buffer, const asm_label_info* labels, short* cod
     assert(buffer   );
     assert(code     );
     assert(code_size);
-    trie_cell_assert(&labels->trie);
+    trie_cell_assert(labels->trie);
 
     char cur_line[MAX_LINE_SIZE   ] = {};
+    char junk    [MAX_LINE_SIZE   ] = {};
     char cur_cmd [MAX_COMMAND_SIZE] = {};
 
     const short* const code_begin = code;
@@ -215,7 +221,10 @@ int compile_code   (const char* buffer, const asm_label_info* labels, short* cod
 
     const COMMAND* check_cmd = {};
 
-    for(int line_cnt = 1; *buffer && !error; ++line_cnt, sscanf(buffer, "%[^\r\n]\r\n%lln", cur_line, &line_size)) {
+    for(int line_cnt = 1; *buffer && !error; ++line_cnt) {
+        if(isblank(*buffer)) sscanf(buffer, "%[ \t\v][^\r\n]\r\n%lln", junk, cur_line, &line_size);
+        else                 sscanf(buffer, "%[^\r\n]\r\n%lln"       ,       cur_line, &line_size);
+
         buffer += line_size;
         // printf("%s\n", cur_line);
         if (!*cur_line) continue;
@@ -248,7 +257,7 @@ int compile_code   (const char* buffer, const asm_label_info* labels, short* cod
 
             if (!strcmp(cur_cmd, check_cmd->name)) {
                 *(code++) = check_cmd->id;
-                printf("%s %lld\n", check_cmd->name, code - code_begin);
+                LOG_PURPLE("%-5s %lld\n", check_cmd->name, code - code_begin);
 
                 switch (check_cmd->agr_type){
                 case NUM_ARG: {
@@ -345,7 +354,7 @@ static int label_buffer_ctor(asm_label_info* labels) {
     assert(labels);
 
     *labels = {};
-    trie_ctor(&labels->trie);
+    labels->trie = trie_ctor();
     labels->data = (asm_label_unit*)calloc(MAX_LABELS, sizeof(asm_label_unit));
 
     return 0;
@@ -353,7 +362,7 @@ static int label_buffer_ctor(asm_label_info* labels) {
 static int label_buffer_dtor(asm_label_info* labels) {
     assert(labels);
 
-    trie_dtor(&labels->trie);
+    trie_dtor(labels->trie);
     free(labels->data);
     *labels = {};
 
@@ -372,6 +381,7 @@ static possible_argument_t convert_to_num_or_reg(const char* argument) {
     int is_num = 1;
     int ind    = 0;
 
+    if(argument[ind] == '-') ind++;
     while(argument[ind]) is_num &= isdigit(argument[ind++]);
 
     if (is_num && *argument) {
@@ -495,7 +505,7 @@ static int compile_label_arg (const char* line, size_t* pos, size_t line_num, sh
         return run_syntax_error(line, "WRONG SINTAX IN COMMAND", line_num);
     }
 
-    if (!trie_exist(&labels->trie, str_arg)) {
+    if (!trie_exist(labels->trie, str_arg)) {
         return run_syntax_error(line, "LABEL NOT EXIST", line_num);
     }
 

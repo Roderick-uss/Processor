@@ -11,4 +11,6 @@
 #define WHITE  "\033[37m"
 #define GRAY   "\033[38m"
 
+#define UNDERLINE  "\033[4m"
+#define DEFAULT    "\033[0m"
 #endif // COLOR_H

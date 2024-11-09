@@ -9,18 +9,14 @@
 
 #define MIN_CAPACITY 8 //must be dividible by 8
 #define MAX_CAPACITY 1 << 24
-#define HASH_BASE (uint64_t)1e9 + 7
-#define HASH_MOD  1791791791
 //todo POISON
 
 enum ERROR_t {
     PRINT_STACK            = 1<<0,
     ZERO_STACK_PTR         = 1<<1,
     ZERO_DATA_PTR          = 1<<2,
-    CORRUPTED_STACK_CANARY = 1<<3,
-    CORRUPTED_DATA_CANARY  = 1<<4,
-    CORRUPTED_STACK_HASH   = 1<<5,
-    CORRUPTED_DATA_HASH    = 1<<6,
+    ON_CANARY_PROT(CORRUPTED_STACK_CANARY = 1<<3,CORRUPTED_DATA_CANARY  = 1<<4,)
+    ON_HASH_PROT  (CORRUPTED_STACK_HASH   = 1<<5,CORRUPTED_DATA_HASH    = 1<<6,)
     CAPACITY_TOO_BIG       = 1<<7,
     SIZE_OVER_CAPACITY     = 1<<8,
 };
@@ -32,6 +28,9 @@ enum ERROR_t {
 }
 
 #ifdef HASH_PROT
+const uint64_t HASH_BASE = (uint64_t)1e9 + 7;
+const uint64_t HASH_MOD  =  1791791791;
+
 static uint64_t calculate_hash(const void* begin, const void* end) {
     assert(!((uint64_t)begin % 8));
     assert(!((uint64_t)end   % 8));
@@ -107,15 +106,9 @@ static int stack_recalloc(stack_t* stk) {
         new_size += 2 * canary_size;
     #endif // CANARY_PROT
 
-//    printf("%llu 0x%llx\n", new_size, (uint64_t)stk->data);
-
     stk->data = (stack_elem_t*)realloc(stk->data, new_size);
 
-//    printf("%llu 0x%llx\n", new_size, (uint64_t)stk->data);
-
-    ON_CANARY_PROT(stk->data = (stack_elem_t* )((char*)stk->data + canary_size));
-
-//    printf("%llu 0x%llx\n", new_size, (uint64_t)stk->data);
+    ON_CANARY_PROT(stk->data = (stack_elem_t*)((char*)stk->data + canary_size));
 
     memset(stk->data + stk->size, 0, (stk->capacity - stk->size) * sizeof(stack_elem_t));
 
@@ -252,7 +245,7 @@ static uint32_t stack_dump(const stack_t* stk, uint32_t error_vector) {
 
     LOG_BLUE("}\n");
 
-    return stack_error;
+    return stack_error & ~PRINT_STACK;
 }
 uint32_t stack_verify(const stack_t* stk) {
     uint32_t stack_error = 0;
@@ -396,6 +389,6 @@ int stack_push(stack_t* stk, stack_elem_t item) {
 }
 
 int stack_print(stack_t* stk) {
-    stack_dump(stk, stack_verify(stk) | PRINT_STACK);
+    assert(!stack_dump(stk, stack_verify(stk) | PRINT_STACK));
     return 0;
 }
