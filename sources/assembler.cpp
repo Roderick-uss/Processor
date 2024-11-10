@@ -79,27 +79,28 @@ int main(int argc, const char* argv[]) {
     if (!output_ptr) {run_file_error(output_file); return 1;}
 
     char* buffer = (char*)get_file_buffer(input_file);
-    if(!buffer) return 1;
+    if(!buffer) error = 1;
 
     LOG_YELLOW ("%s", buffer);
 
     short* code = (short*)calloc(MAX_CODE_SIZE, sizeof(short));
-    assert(code);
+    if (!code) error = 1;
     size_t code_size = 0;
     asm_label_info labels = {};
-    label_buffer_ctor(&labels);
+    error |= label_buffer_ctor(&labels);
 
     if (!error) error = compile_labels(buffer, &labels);
     if (!error) error = compile_code  (buffer, &labels, code, &code_size);
 
     // write_info  (output_ptr);
     // write_labels(output_ptr, &labels);
-    if (!error) write_code(output_ptr, code, code_size);
-
-    LOG_WHITE("WRITED\n");
+    if (!error) {
+        write_code(output_ptr, code, code_size);
+        LOG_WHITE("WRITED\n");
+    }
 
     fclose(output_ptr);
-    label_buffer_dtor(&labels);
+    error != label_buffer_dtor(&labels);
     free(buffer);
     free(code  );
     fclose(output_ptr);
@@ -188,6 +189,10 @@ int compile_labels (const char* buffer, asm_label_info* labels) {
 
         asm_label_unit new_label = {};
         new_label.name = (char*)calloc(line_pos - 1,sizeof(char));
+        if (!new_label.name) {
+            error = run_unidentified_error(cur_line, "NO LABEL NAME MEMORY ALLOCATE", line_cnt);
+            continue;
+        }
         strcpy(new_label.name, cur_label);
         new_label.ip = ip;
 
@@ -356,6 +361,7 @@ static int label_buffer_ctor(asm_label_info* labels) {
     *labels = {};
     labels->trie = trie_ctor();
     labels->data = (asm_label_unit*)calloc(MAX_LABELS, sizeof(asm_label_unit));
+    if (!labels->data) return 1;
 
     return 0;
 }

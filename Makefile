@@ -28,7 +28,7 @@ DISASSEMBLER_O := $(patsubst %,$(O_PREFIX)%.o,$(DISASSEMBLER_S))
 
 HEADER_LIST =$(H_PREFIX)*.h $(STACK_HEADER)
 
-all: assembler processor disassembler
+all: assembler processor
 
 print:
 	@echo $(ASSEMBLER_O)

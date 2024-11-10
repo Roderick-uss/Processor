@@ -4,25 +4,25 @@
 #include "soft_processor_unit.h"
 #include "processor_info.h"
 
-int PROC_HLT  (spu_t* spu);
-int PROC_OUT  (spu_t* spu);
-int PROC_ADD  (spu_t* spu);
-int PROC_SUB  (spu_t* spu);
-int PROC_MUL  (spu_t* spu);
-int PROC_DIV  (spu_t* spu);
-int PROC_TDIV (spu_t* spu);
-int PROC_MOD  (spu_t* spu);
-int PROC_SQRT (spu_t* spu);
-int PROC_PUSH (spu_t* spu);
-int PROC_POP  (spu_t* spu);
-int PROC_JMP  (spu_t* spu);
-int PROC_JB   (spu_t* spu);
-int PROC_JA   (spu_t* spu);
-int PROC_JE   (spu_t* spu);
-int PROC_JNE  (spu_t* spu);
-int PROC_CALL (spu_t* spu);
-int PROC_DRAW (spu_t* spu);
-int PROC_BREAK(spu_t* spu);
-int PROC_ERROR(spu_t* spu);
+int proc_hlt  (spu_t* spu);
+int proc_out  (spu_t* spu);
+int proc_add  (spu_t* spu);
+int proc_sub  (spu_t* spu);
+int proc_mul  (spu_t* spu);
+int proc_div  (spu_t* spu);
+int proc_tdiv (spu_t* spu);
+int proc_mod  (spu_t* spu);
+int proc_sqrt (spu_t* spu);
+int proc_push (spu_t* spu);
+int proc_pop  (spu_t* spu);
+int proc_jmp  (spu_t* spu);
+int proc_jb   (spu_t* spu);
+int proc_ja   (spu_t* spu);
+int proc_je   (spu_t* spu);
+int proc_jne  (spu_t* spu);
+int proc_call (spu_t* spu);
+int proc_draw (spu_t* spu);
+int proc_break(spu_t* spu);
+int proc_error(spu_t* spu);
 
 #endif // CMD_PROC_H

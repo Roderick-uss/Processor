@@ -10,14 +10,14 @@
 #include "soft_processor_unit.h"
 #include "stack.h"
 
-int PROC_HLT  (spu_t* spu) {
+int proc_hlt  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     spu->ip = END_PROC;
 
     return 0;
 }
-int PROC_OUT  (spu_t* spu) {
+int proc_out  (spu_t* spu) {
     ASSERT_SPU(spu);
     spu_print(spu);
 
@@ -31,7 +31,7 @@ int PROC_OUT  (spu_t* spu) {
 
     return 0;
 }
-int PROC_ADD  (spu_t* spu) {
+int proc_add  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0, b = 0;
@@ -42,7 +42,7 @@ int PROC_ADD  (spu_t* spu) {
 
     return 0;
 }
-int PROC_SUB  (spu_t* spu) {
+int proc_sub  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0, b = 0;
@@ -53,7 +53,7 @@ int PROC_SUB  (spu_t* spu) {
 
     return 0;
 }
-int PROC_MUL (spu_t* spu) {
+int proc_mul  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0, b = 0;
@@ -64,7 +64,7 @@ int PROC_MUL (spu_t* spu) {
 
     return 0;
 }
-int PROC_DIV (spu_t* spu) {
+int proc_div  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0, b = 0;
@@ -75,7 +75,7 @@ int PROC_DIV (spu_t* spu) {
 
     return 0;
 }
-int PROC_TDIV (spu_t* spu) {
+int proc_tdiv (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0, b = 0;
@@ -86,7 +86,7 @@ int PROC_TDIV (spu_t* spu) {
 
     return 0;
 }
-int PROC_MOD (spu_t* spu) {
+int proc_mod  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0, b = 0;
@@ -97,7 +97,7 @@ int PROC_MOD (spu_t* spu) {
 
     return 0;
 }
-int PROC_SQRT(spu_t* spu) {
+int proc_sqrt (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int a = 0;
@@ -107,7 +107,7 @@ int PROC_SQRT(spu_t* spu) {
 
     return 0;
 }
-int PROC_PUSH (spu_t* spu) {
+int proc_push (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int result = 0;
@@ -120,7 +120,7 @@ int PROC_PUSH (spu_t* spu) {
 
     return 0;
 }
-int PROC_POP  (spu_t* spu) {
+int proc_pop  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     int  arg_type = spu->code[spu->ip++];
@@ -142,7 +142,7 @@ int PROC_POP  (spu_t* spu) {
 
     return 0;
 }
-int PROC_JMP  (spu_t* spu) {
+int proc_jmp  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     spu->ip++;
@@ -150,7 +150,7 @@ int PROC_JMP  (spu_t* spu) {
 
     return 0;
 }
-int PROC_JB   (spu_t* spu) {
+int proc_jb   (spu_t* spu) {
     ASSERT_SPU(spu);
     // spu_print(spu);
 
@@ -163,7 +163,7 @@ int PROC_JB   (spu_t* spu) {
 
     return 0;
 }
-int PROC_JA   (spu_t* spu) {
+int proc_ja   (spu_t* spu) {
     ASSERT_SPU(spu);
 
     spu->ip++;
@@ -175,7 +175,7 @@ int PROC_JA   (spu_t* spu) {
 
     return 0;
 }
-int PROC_JE   (spu_t* spu) {
+int proc_je   (spu_t* spu) {
     ASSERT_SPU(spu);
 
     spu->ip++;
@@ -187,7 +187,7 @@ int PROC_JE   (spu_t* spu) {
 
     return 0;
 }
-int PROC_JNE  (spu_t* spu) {
+int proc_jne  (spu_t* spu) {
     ASSERT_SPU(spu);
 
     spu->ip++;
@@ -199,7 +199,7 @@ int PROC_JNE  (spu_t* spu) {
 
     return 0;
 }
-int PROC_CALL (spu_t* spu) {
+int proc_call (spu_t* spu) {
     ASSERT_SPU(spu);
 
     spu->ip++;
@@ -208,7 +208,7 @@ int PROC_CALL (spu_t* spu) {
 
     return 0;
 }
-int PROC_DRAW (spu_t* spu) {
+int proc_draw (spu_t* spu) {
     ASSERT_SPU(spu);
 
     for(size_t i = 0; i < RAM_SIZE; ++i) {
@@ -228,7 +228,7 @@ int PROC_DRAW (spu_t* spu) {
 
     return 0;
 }
-int PROC_BREAK(spu_t* spu) {
+int proc_break(spu_t* spu) {
     ASSERT_SPU(spu);
 
     if (spu->call_deep == 0) return 1;
@@ -236,7 +236,7 @@ int PROC_BREAK(spu_t* spu) {
 
     return 0;
 }
-int PROC_ERROR(spu_t* spu) {
+int proc_error(spu_t* spu) {
     ASSERT_SPU(spu);
     LOG_FATAL("NO FUNCTION");
     return 1;

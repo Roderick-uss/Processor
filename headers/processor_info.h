@@ -75,26 +75,26 @@ struct COMMAND {
 
 #ifdef    START_PROCESSOR
 const COMMAND CMD_LIST[] ={
-{"HLT"  , 0, HLT  , NO_ARG   , PROC_HLT  },
-{"OUT"  , 0, OUT  , NO_ARG   , PROC_OUT  },
-{"ADD"  , 0, ADD  , NO_ARG   , PROC_ADD  },
-{"SUB"  , 0, SUB  , NO_ARG   , PROC_SUB  },
-{"MUL"  , 0, MUL  , NO_ARG   , PROC_MUL  },
-{"DIV"  , 0, DIV  , NO_ARG   , PROC_DIV  },
-{"TDIV" , 0, TDIV , NO_ARG   , PROC_TDIV },
-{"MOD"  , 0, MOD  , NO_ARG   , PROC_MOD  },
-{"PUSH" , 1, PUSH , PUSH_ARG , PROC_PUSH },
-{"POP"  , 1, POP  , POP_ARG  , PROC_POP  },
-{"JMP"  , 1, JMP  , LABEL_ARG, PROC_JMP  },
-{"JA"   , 1, JA   , LABEL_ARG, PROC_JA   },
-{"JB"   , 1, JB   , LABEL_ARG, PROC_JB   },
-{"JE"   , 1, JE   , LABEL_ARG, PROC_JE   },
-{"JNE"  , 1, JNE  , LABEL_ARG, PROC_JNE  },
-{"CALL" , 1, CALL , LABEL_ARG, PROC_CALL },
-{"DRAW" , 0, DRAW , NO_ARG   , PROC_DRAW },
-{"BREAK", 0, BREAK, NO_ARG   , PROC_BREAK},
-{"SQRT" , 0, SQRT , NO_ARG   , PROC_SQRT },
-{""     , 0, UNDEF, NO_ARG   , PROC_ERROR}}; // uind must be last element
+{"HLT"  , 0, HLT  , NO_ARG   , proc_hlt  },
+{"OUT"  , 0, OUT  , NO_ARG   , proc_out  },
+{"ADD"  , 0, ADD  , NO_ARG   , proc_add  },
+{"SUB"  , 0, SUB  , NO_ARG   , proc_sub  },
+{"MUL"  , 0, MUL  , NO_ARG   , proc_mul  },
+{"DIV"  , 0, DIV  , NO_ARG   , proc_div  },
+{"TDIV" , 0, TDIV , NO_ARG   , proc_tdiv },
+{"MOD"  , 0, MOD  , NO_ARG   , proc_mod  },
+{"PUSH" , 1, PUSH , PUSH_ARG , proc_push },
+{"POP"  , 1, POP  , POP_ARG  , proc_pop  },
+{"JMP"  , 1, JMP  , LABEL_ARG, proc_jmp  },
+{"JA"   , 1, JA   , LABEL_ARG, proc_ja   },
+{"JB"   , 1, JB   , LABEL_ARG, proc_jb   },
+{"JE"   , 1, JE   , LABEL_ARG, proc_je   },
+{"JNE"  , 1, JNE  , LABEL_ARG, proc_jne  },
+{"CALL" , 1, CALL , LABEL_ARG, proc_call },
+{"DRAW" , 0, DRAW , NO_ARG   , proc_draw },
+{"BREAK", 0, BREAK, NO_ARG   , proc_break},
+{"SQRT" , 0, SQRT , NO_ARG   , proc_sqrt },
+{""     , 0, UNDEF, NO_ARG   , proc_error}}; // uind must be last element
 
 #else //  START_PROCESSOR
 

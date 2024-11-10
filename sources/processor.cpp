@@ -19,11 +19,13 @@ struct label_t {
     size_t ip;
 };
 
+typedef short elem_t;
+
 static int run_proc(spu_t* spu);
 
-static size_t get_size(void* code);
+static size_t get_size(char* code, size_t* size);
 // static int verify_code_version(void** code);
-static int copy_code(spu_t* spu, size_t size, const short* code);
+static int copy_code(spu_t* spu, size_t size, const char* code);
 
 int main(int argc, const char* argv[]) {
     const char* input_file = BASE_INPUT_FILE;
@@ -39,14 +41,15 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
     // return 1;
-
-    short* code_buffer = (short*)get_file_buffer(input_file);
+    char* code_buffer = (char*)get_file_buffer(input_file);
     if (!code_buffer) {
-        LOG_FATAL("NO CODE GOT\n");
-        return 0;
+        LOG_FATAL("NO CODE SCANNED\n");
+        return 1;
     }
-    size_t code_size = get_size(&code_buffer);
-    copy_code(spu, code_size, code_buffer);
+    size_t buffer_shift = 0;
+    size_t code_size = 0;
+    buffer_shift = get_size(code_buffer, &code_size);
+    copy_code(spu, code_size, code_buffer + buffer_shift);
 
     run_proc(spu);
 
@@ -56,24 +59,18 @@ int main(int argc, const char* argv[]) {
     return 0;
 }
 
-static size_t get_size(void* code) {
-    char** code_ = (char**)code;
-    assert(code_);
-    assert(*code_);
-
-    size_t size = *(size_t*)*code_;
-    *code_ += sizeof(size);
-
-    return size;
+static size_t get_size(char* code, size_t* size) {
+    assert(code);
+    *size = *(size_t*)code;
+    return sizeof(size_t);
 }
 
-static int copy_code(spu_t* spu, size_t size, const short* code) {
+static int copy_code(spu_t* spu, size_t size, const char* code) {
     ASSERT_SPU(spu);
+    assert(code);
 
     spu->code_size = size;
-    for(size_t i = 0; i < size; ++i) {
-        spu->code[i] = (int)code[i];
-    }
+    for(size_t i = 0; i < size; i++) spu->code[i] = ((elem_t*)code)[i];
 
     return 0;
 }
