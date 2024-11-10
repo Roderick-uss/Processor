@@ -14,8 +14,8 @@ static const char * const BASE_OUTPUT_FILE = "text_file/processed.bin";
 
 static const char REGISTER_IDENTIFICATOR = 'x';
 
-static const int MAX_ARGUMENT_SIZE = 10;
-static const int MAX_COMMAND_SIZE  = 11;
+static const int MAX_ARGUMENT_SIZE = 20;
+static const int MAX_COMMAND_SIZE  = 20;
 static const int MAX_LINE_SIZE     = 50;
 
 struct asm_label_unit {

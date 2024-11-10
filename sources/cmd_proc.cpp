@@ -19,7 +19,7 @@ int proc_hlt  (spu_t* spu) {
 }
 int proc_out  (spu_t* spu) {
     ASSERT_SPU(spu);
-    spu_print(spu);
+    // spu_print(spu);
 
     int result = 0;
     if (spu->stk->size == 0) {

@@ -41,7 +41,7 @@ SOLVESQUARE:
     PUSH -1
     MUL
     PUSH dx
-    SUB
+    ADD
     PUSH ax
     PUSH 2
     MUL
@@ -59,9 +59,7 @@ CALCDISCR:
     PUSH cx
     PUSH ax
     MUL
-    MUL
     ADD
-    SQRT
     POP dx
 BREAK
 
